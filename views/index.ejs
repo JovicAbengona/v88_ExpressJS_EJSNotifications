@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="https://learn.village88.com/assets/black_ninja-9adea777014ced1d5d36046555cf036c.ico?v=2" type="image/x-icon">
+        <link rel="stylesheet" href="/stylesheets/index.css">
+        <script src="https://kit.fontawesome.com/929adf1879.js" crossorigin="anonymous"></script>
+        <title>Village88 | NodeJS (Express) | Notifications</title>
+    </head>
+    <body>
+        <section>
+            <div class="notif-container">
+                <div class="notif-header">
+                    <h1><i class="fas fa-exclamation"></i> DojoNotifications</h1>
+                    <p id="notif-count"></p>
+                </div>
+                <div class="notif-body">
+                    <!--
+                        USER MESSAGES APPEAR HERE
+                    -->
+                </div>
+                <div class="notif-btn">
+                    <button id="notif_trigger">NOTIFY EVERYONE!</button>
+                </div>
+            </div>
+            <footer>
+                DojoNotifications &copy <span id="year"></span>
+            </footer>
+        </section>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script>
+            $(document).ready(function(){
+                const socket = io();
+                let socket_id;
+
+                // TODO: Get Year for the Footer
+                $("#year").html(new Date().getFullYear());
+
+                socket.on("send_socket_id", data => {
+                    socket_id = data;
+                    console.log(socket_id);
+                });
+
+                $("#notif_trigger").click(() => {
+                    socket.emit("trigger_notification", socket_id);
+                });
+
+                socket.on("send_notification", data => {
+                    $(".notif-body").html("");
+                    renderNotifications(data);
+                });
+
+                function renderNotifications(notifications){
+                    console.log(socket_id);
+                    let count = 0;
+                    notifications.forEach(function(value){
+                        let sender = (value.id == socket_id) ? "You" : value.id; 
+                        let event = value.type == "connect" ? "joined us!" : (value.type == "disconnect" ? "left us!" : "triggered a notification!");
+                        let icon = event == "joined us!" ? "fas fa-check" : (event == "left us!" ? "fas fa-times" : "fas fa-exclamation");
+                        let div = document.createElement("div");
+                        div.classList.add(`${value.type}`);
+                        div.innerHTML = `<p><i class="${icon}"></i> SOCKET ID: <span class="id">${sender}</span> ${event}</p>`;
+                            
+                        $(".notif-body").append(div);
+                        count++;
+
+                        // TODO: Scroll down
+                        $(".notif-body").scrollTop($(".notif-body")[0].scrollHeight);
+                    });
+
+                    $("#notif-count").html(`<i class="fas fa-bell"></i> ${count}`);
+                }
+            });
+        </script>
+    </body>
+</html>
