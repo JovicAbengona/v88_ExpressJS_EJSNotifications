@@ -57,12 +57,12 @@
                     console.log(socket_id);
                     let count = 0;
                     notifications.forEach(function(value){
-                        let sender = (value.id == socket_id) ? "You" : value.id; 
+                        let sender = (value.id == socket_id) ? "You" : `SOCKET ID: ${value.id}`; 
                         let event = value.type == "connect" ? "joined us!" : (value.type == "disconnect" ? "left us!" : "triggered a notification!");
                         let icon = event == "joined us!" ? "fas fa-check" : (event == "left us!" ? "fas fa-times" : "fas fa-exclamation");
                         let div = document.createElement("div");
                         div.classList.add(`${value.type}`);
-                        div.innerHTML = `<p><i class="${icon}"></i> SOCKET ID: <span class="id">${sender}</span> ${event}</p>`;
+                        div.innerHTML = `<p><i class="${icon}"></i> <span class="id">${sender}</span> ${event}</p>`;
                             
                         $(".notif-body").append(div);
                         count++;
